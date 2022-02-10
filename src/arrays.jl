@@ -30,9 +30,7 @@ function fieldarray(::UndefInitializer, S, ::Type{A}, dims::Dims) where {A}
     N = _numfields(S)
     T = _fieldtype(S)
 
-    if N == 1 && S isa Type && S <: Number
-        return A{S}(undef, dims)
-    end
+    S isa Type && S <: Number && error("fieldarray requires `!(S <: Number)`")
 
     if length(dims) == 0
         d = (N, )
