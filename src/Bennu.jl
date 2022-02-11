@@ -28,7 +28,7 @@ export spectralderivative, spectralinterpolation, legendregauss,
        connectivity, points, brickgrid, toequallyspaced,
        cubedspheregrid, min_node_distance
 
-export fieldarray
+export BennuArray
 
 export components
 

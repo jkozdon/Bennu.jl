@@ -1,3 +1,24 @@
+struct BennuArray{T, N, C, I, AT} <: AbstractArray{T, N}
+    array::StructArray{T, N, C, I}
+    data::AT
+    function BennuArray(array::StructArray{T, N, C, I}) where {T, N, C, I}
+        data = parent(components(array)[1])
+        AT = typeof(data)
+        @assert all(map(y -> pointer(parent(y)) === pointer(data),
+                        values(components(array))))
+        return new{T, N, C, I, AT}(array, data)
+    end
+end
+Base.size(f::BennuArray) = size(f.sa)
+Base.@propagate_inbounds function Base.getindex(f::BennuArray, a...)
+    return getindex(f.sa, a...)
+end
+Base.@propagate_inbounds function Base.setindex!(f::BennuArray, a...)
+    setindex!(f.sa, a...)
+end
+Tullio.storage_type(a::BennuArray) = Tullio.storage_type(a.sa)
+components(a::BennuArray) = components(a.sa)
+
 arraytype(A) = Tullio.storage_type(A) <: CuArray ? CuArray : Array
 arraytype(::Type{T}) where {T} = Array
 arraytype(::Type{<:CuArray}) = CuArray
@@ -26,11 +47,11 @@ _fieldtype(::Type{S}) where {S} = eltype(S)
 _fieldtype(T::Tuple) = promote_type(map(_fieldtype, T)...)
 _fieldtype(N::NamedTuple) = promote_type(map(_fieldtype, N)...)
 
-function fieldarray(::UndefInitializer, S, ::Type{A}, dims::Dims) where {A}
+function BennuArray(::UndefInitializer, S, ::Type{A}, dims::Dims) where {A}
     N = _numfields(S)
     T = _fieldtype(S)
 
-    S isa Type && S <: Number && error("fieldarray requires `!(S <: Number)`")
+    S isa Type && S <: Number && error("BennuArray requires `!(S <: Number)`")
 
     if length(dims) == 0
         d = (N, )
@@ -47,7 +68,8 @@ function fieldarray(::UndefInitializer, S, ::Type{A}, dims::Dims) where {A}
         return view(data, viewtuple...)
     end
 
-    return fieldarray(S, dataviews)
+    sa = _fieldarray(S, dataviews)
+    BennuArray(sa)
 end
 
 function _ckfieldargs(S, data::Tuple)
@@ -66,7 +88,7 @@ function _ckfieldargs(S, data::Tuple)
     end
 end
 
-function fieldarray(::Type{S}, data::Tuple) where {S}
+function _fieldarray(::Type{S}, data::Tuple) where {S}
     d = only(data)
     if S != eltype(d)
         throw(ArgumentError("Data array does not have the correct eltype."))
@@ -75,17 +97,17 @@ function fieldarray(::Type{S}, data::Tuple) where {S}
     return d
 end
 
-function fieldarray(::Type{S}, data::Tuple) where {S <: SArray}
+function _fieldarray(::Type{S}, data::Tuple) where {S <: SArray}
     _ckfieldargs(S, data)
     return StructArray{S}(data)
 end
 
-function fieldarray(S::NamedTuple, data::Tuple)
+function _fieldarray(S::NamedTuple, data::Tuple)
     _ckfieldargs(S, data)
 
     offsets = cumsum((1, map(_numfields, S)...))
     fields = ntuple(length(S)) do i
-        fieldarray(S[i], data[offsets[i]:offsets[i+1]-1])
+        _fieldarray(S[i], data[offsets[i]:offsets[i+1]-1])
     end
 
     return StructArray(NamedTuple{keys(S)}(fields))

@@ -10,25 +10,25 @@
         TAs = (TAs..., (Float32, CuArray))
     end
     for (T, A) in TAs
-        a = fieldarray(undef, (a = T,), A, ())
+        a = BennuArray(undef, (a = T,), A, ())
         @test size(a) == ()
 
-        a = fieldarray(undef, (a = T, ), A, (3,))
+        a = BennuArray(undef, (a = T, ), A, (3,))
         @test size(a) == (3,)
         @test eltype(a) == NamedTuple{(:a, ), Tuple{T}}
         @test Tullio.storage_type(a) <: A
 
-        a = fieldarray(undef, (a = T,), A, (3,4))
+        a = BennuArray(undef, (a = T,), A, (3,4))
         @test size(a) == (3,4)
         @test eltype(a) == NamedTuple{(:a, ), Tuple{T}}
         @test Tullio.storage_type(a) <: A
 
-        a = fieldarray(undef, (a=SVector{2, T}, b=T), A, (3,4))
+        a = BennuArray(undef, (a=SVector{2, T}, b=T), A, (3,4))
         @test size(a) == (3,4)
         @test eltype(a) == NamedTuple{(:a, :b), Tuple{SVector{2, T}, T}}
         @test Tullio.storage_type(a) <: A
 
-        a = fieldarray(undef, SVector{2, T}, A, (3,4))
+        a = BennuArray(undef, SVector{2, T}, A, (3,4))
         @test size(a) == (3,4)
         @test eltype(a) == SVector{2, T}
         @test Tullio.storage_type(a) <: A

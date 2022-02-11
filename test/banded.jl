@@ -70,13 +70,13 @@
         ldiv!(d_x, d_LU, d_b)
         @test Array(d_x) ≈ h_x
 
-        # make sure this all works with fieldarray types too
-        fld_b = fieldarray(undef, SVector{Nfields, T}, AT, (Nq..., Nev * Neh))
+        # make sure this all works with BennuArray types too
+        fld_b = BennuArray(undef, SVector{Nfields, T}, AT, (Nq..., Nev * Neh))
         # Since get_batched_array is a ReshapedArray, the copy! functions don't
         # work on the GPU, but the parent is a PermutedDimsArray array which
         # works fine...
         copyto!(parent(Bennu.get_batched_array(fld_b, Nqh, Neh)), 1, d_b, 1)
-        fld_x = fieldarray(undef, SVector{Nfields, T}, AT, (Nq..., Nev * Neh))
+        fld_x = BennuArray(undef, SVector{Nfields, T}, AT, (Nq..., Nev * Neh))
         ldiv!(fld_x, d_LU, fld_b)
 
         # Since get_batched_array is a ReshapedArray, the copy! functions don't
@@ -128,9 +128,9 @@
             D = AT(Array(derivatives(LobattoCell{T, Array}(Nq...))[end]))
 
             # Set up the field storage
-            q = fieldarray(undef, SVector{Nfields, T}, grid)
-            dq = fieldarray(undef, SVector{Nfields, T}, grid)
-            A = fieldarray(undef, SMatrix{Nfields, Nfields, T}, grid)
+            q = BennuArray(undef, SVector{Nfields, T}, grid)
+            dq = BennuArray(undef, SVector{Nfields, T}, grid)
+            A = BennuArray(undef, SMatrix{Nfields, Nfields, T}, grid)
 
             # Some random coefficients to keep things interesting!
             Np = prod(Nq)

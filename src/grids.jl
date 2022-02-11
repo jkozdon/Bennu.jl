@@ -351,9 +351,9 @@ end
     end
 end
 
-function fieldarray(init, S, grid::AbstractGrid)
+function BennuArray(init, S, grid::AbstractGrid)
     Nq = length(celltype(grid))
     Ne = length(grid)
     A = arraytype(grid)
-    return fieldarray(init, S, A, (Nq, Ne))
+    return BennuArray(init, S, A, (Nq, Ne))
 end

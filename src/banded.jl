@@ -51,7 +51,7 @@ end
 """
     get_batched_array(x::StructArray, Nqh, Neh)
 
-Get the array that backs fieldarray `x` with horiztonal workgroup size `Nqh` and
+Get the array that backs BennuArray `x` with horiztonal workgroup size `Nqh` and
 horizonal number workgroups `Neh` in the format used by the batched routines.
 
 The main functionality of this routine is to permuate the vertical dof and field
