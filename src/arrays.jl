@@ -1,23 +1,31 @@
 struct BennuArray{T, N, C, I, AT} <: AbstractArray{T, N}
-    array::StructArray{T, N, C, I}
+    structarray::StructArray{T, N, C, I}
     data::AT
-    function BennuArray(array::StructArray{T, N, C, I}) where {T, N, C, I}
-        data = parent(components(array)[1])
+    function BennuArray(structarray::StructArray{T, N, C, I}) where {T, N, C, I}
+        # Get the parent data array
+        data = structarray
+        while data isa StructArray
+            data = parent(components(data)[1])
+        end
         AT = typeof(data)
-        @assert all(map(y -> pointer(parent(y)) === pointer(data),
-                        values(components(array))))
-        return new{T, N, C, I, AT}(array, data)
+
+        # Check that all data in the structarray are backed by same parent array
+        @assert _validate_fieldarray(structarray, data)
+        return new{T, N, C, I, AT}(structarray, data)
     end
 end
-Base.size(f::BennuArray) = size(f.sa)
+Base.size(f::BennuArray) = size(f.structarray)
 Base.@propagate_inbounds function Base.getindex(f::BennuArray, a...)
-    return getindex(f.sa, a...)
+    return getindex(f.structarray, a...)
 end
 Base.@propagate_inbounds function Base.setindex!(f::BennuArray, a...)
-    setindex!(f.sa, a...)
+    setindex!(f.structarray, a...)
 end
-Tullio.storage_type(a::BennuArray) = Tullio.storage_type(a.sa)
-components(a::BennuArray) = components(a.sa)
+Tullio.storage_type(a::BennuArray) = Tullio.storage_type(a.structarray)
+components(a::BennuArray) = components(a.structarray)
+_validate_fieldarray(a::StructArray, data) =
+all(_validate_fieldarray.(values(components(a)), Ref(data)))
+_validate_fieldarray(a, data) = pointer(parent(a)) == pointer(data)
 
 arraytype(A) = Tullio.storage_type(A) <: CuArray ? CuArray : Array
 arraytype(::Type{T}) where {T} = Array
@@ -68,8 +76,8 @@ function BennuArray(::UndefInitializer, S, ::Type{A}, dims::Dims) where {A}
         return view(data, viewtuple...)
     end
 
-    sa = _fieldarray(S, dataviews)
-    BennuArray(sa)
+    structarrayn = _fieldarray(S, dataviews)
+    BennuArray(structarrayn)
 end
 
 function _ckfieldargs(S, data::Tuple)

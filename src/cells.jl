@@ -241,6 +241,9 @@ function materializemetrics(referencecell::LobattoLine, points, unwarpedbrick)
     D₁ = only(derivatives(referencecell))
     x₁ = only(components(points))
 
+    @show typeof(points)
+    @show typeof(J)
+    @show typeof(x₁)
     if unwarpedbrick
         @tullio avx=false J[i, e] = (x₁[end, e] - x₁[1, e]) / 2
     else
