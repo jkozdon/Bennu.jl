@@ -241,9 +241,6 @@ function materializemetrics(referencecell::LobattoLine, points, unwarpedbrick)
     D₁ = only(derivatives(referencecell))
     x₁ = only(components(points))
 
-    @show typeof(points)
-    @show typeof(J)
-    @show typeof(x₁)
     if unwarpedbrick
         @tullio avx=false J[i, e] = (x₁[end, e] - x₁[1, e]) / 2
     else
@@ -425,8 +422,8 @@ function materializemetrics(referencecell::LobattoHex, points, unwarpedbrick)
     D₁, D₂, D₃ = derivatives(referencecell)
     x₁, x₂, x₃ = components(points)
 
+    h = BennuArray(undef, SMatrix{3, 3, T, 9}, A, (num_cellindices, num_cells))
     if unwarpedbrick
-        h = BennuArray(undef, SMatrix{3, 3, T, 9}, A, (num_cellindices, num_cells))
         h₁₁, h₂₁, h₃₁, h₁₂, h₂₂, h₃₂, h₁₃, h₂₃, h₃₃ = components(h)
         x₁ = reshape(x₁, size(referencecell)..., num_cells)
         x₂ = reshape(x₂, size(referencecell)..., num_cells)
@@ -444,9 +441,21 @@ function materializemetrics(referencecell::LobattoHex, points, unwarpedbrick)
         h₂₃ .= 0
         @tullio avx=false h₃₃[i, e] = (x₃[1, 1, end, e] - x₃[1, 1, 1, e]) / 2
     else
-        h = BennuArray(SMatrix{3, 3, T, 9}, (D₁ * x₁, D₁ * x₂, D₁ * x₃,
-                                             D₂ * x₁, D₂ * x₂, D₂ * x₃,
-                                             D₃ * x₁, D₃ * x₂, D₃ * x₃))
+        h₁₁, h₂₁, h₃₁, h₁₂, h₂₂, h₃₂, h₁₃, h₂₃, h₃₃ = components(h)
+        @show typeof(h₁₁)
+        @show typeof(D₁)
+        @show typeof(x₁)
+        println("I'm Here!")
+        h₁₁ .= D₁ * x₁
+        h₁₂ .= D₁ * x₂
+        h₁₃ .= D₂ * x₃
+        h₂₁ .= D₂ * x₁
+        h₂₂ .= D₂ * x₂
+        h₂₃ .= D₁ * x₃
+        h₃₁ .= D₃ * x₁
+        h₃₂ .= D₃ * x₂
+        h₃₃ .= D₃ * x₃
+        println("Now I am here!")
     end
 
     @. J = det(h)

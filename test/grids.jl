@@ -48,17 +48,17 @@
         x = adapt(Array, points(grid))
         @test isapprox(x[faceindices⁻], x[faceindices⁺], atol=10eps(T))
 
-        if T != BigFloat
-            mktempdir() do tmp
-                outfiles = vtk_grid(joinpath(tmp, "grid_$(T)_$(A)"), grid;
-                                    append=false, ascii=true) do vtk
-                    vtk["Time"] = 37.0
-                end
-                for file in outfiles
-                    @test EzXML.readxml(file) isa EzXML.Document
-                end
-            end
-        end
+        # if T != BigFloat
+        #     mktempdir() do tmp
+        #         outfiles = vtk_grid(joinpath(tmp, "grid_$(T)_$(A)"), grid;
+        #                             append=false, ascii=true) do vtk
+        #             vtk["Time"] = 37.0
+        #         end
+        #         for file in outfiles
+        #             @test EzXML.readxml(file) isa EzXML.Document
+        #         end
+        #     end
+        # end
 
         let
             verts = adapt(A, [

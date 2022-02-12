@@ -21,8 +21,8 @@ using WriteVTK
 
 CUDA.allowscalar(false)
 
-include("arrays.jl")
-include("cells.jl")
+# include("arrays.jl")
+# include("cells.jl")
 include("gridgenerators.jl")
 # include("grids.jl")
 # include("stackedgrids.jl")
