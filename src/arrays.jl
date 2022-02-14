@@ -47,7 +47,7 @@ function fieldarray(::UndefInitializer, S, ::Type{A}, dims::Dims) where {A}
         return view(data, viewtuple...)
     end
 
-    return fieldarray(S, dataviews)
+    return _fieldarray(S, dataviews)
 end
 
 function _ckfieldargs(S, data::Tuple)
@@ -66,7 +66,7 @@ function _ckfieldargs(S, data::Tuple)
     end
 end
 
-function fieldarray(::Type{S}, data::Tuple) where {S}
+function _fieldarray(::Type{S}, data::Tuple) where {S}
     d = only(data)
     if S != eltype(d)
         throw(ArgumentError("Data array does not have the correct eltype."))
@@ -75,17 +75,17 @@ function fieldarray(::Type{S}, data::Tuple) where {S}
     return d
 end
 
-function fieldarray(::Type{S}, data::Tuple) where {S <: SArray}
+function _fieldarray(::Type{S}, data::Tuple) where {S <: SArray}
     _ckfieldargs(S, data)
     return StructArray{S}(data)
 end
 
-function fieldarray(S::NamedTuple, data::Tuple)
+function _fieldarray(S::NamedTuple, data::Tuple)
     _ckfieldargs(S, data)
 
     offsets = cumsum((1, map(_numfields, S)...))
     fields = ntuple(length(S)) do i
-        fieldarray(S[i], data[offsets[i]:offsets[i+1]-1])
+        _fieldarray(S[i], data[offsets[i]:offsets[i+1]-1])
     end
 
     return StructArray(NamedTuple{keys(S)}(fields))

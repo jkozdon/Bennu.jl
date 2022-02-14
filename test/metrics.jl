@@ -51,9 +51,12 @@
 
             unwarpedgrid = brickgrid(cell, (-1:Δx₁:1, -1:Δx₂:1))
             x̂ = points(unwarpedgrid)
-            ĥ = fieldarray(SMatrix{2, 2, T, 4},
-                           (f₁₁.(x̂).*(Δx₁/2), f₂₁.(x̂).*(Δx₁/2),
-                            f₁₂.(x̂).*(Δx₂/2), f₂₂.(x̂).*(Δx₂/2)))
+            ĥ = fieldarray(undef, SMatrix{2, 2, T, 4}, A, size(x̂))
+            ĥ₁₁, ĥ₂₁, ĥ₁₂, ĥ₂₂ = components(ĥ)
+            ĥ₁₁ .= f₁₁.(x̂).*(Δx₁/2)
+            ĥ₂₁ .= f₂₁.(x̂).*(Δx₁/2)
+            ĥ₁₂ .= f₁₂.(x̂).*(Δx₂/2)
+            ĥ₂₂ .= f₂₂.(x̂).*(Δx₂/2)
             Ĵ = adapt(Array, det.(ĥ))
             ĝ = adapt(Array, inv.(ĥ))
 
@@ -129,18 +132,17 @@
 
             unwarpedgrid = brickgrid(cell, (-1:Δx₁:1, -1:Δx₂:1, -1:Δx₃:1))
             x̂ = points(unwarpedgrid)
-            ĥ = fieldarray(SMatrix{3, 3, T, 9},
-                           (
-                            f₁₁.(x̂).*(Δx₁/2),
-                            f₂₁.(x̂).*(Δx₁/2),
-                            f₃₁.(x̂).*(Δx₁/2),
-                            f₁₂.(x̂).*(Δx₂/2),
-                            f₂₂.(x̂).*(Δx₂/2),
-                            f₃₂.(x̂).*(Δx₂/2),
-                            f₁₃.(x̂).*(Δx₃/2),
-                            f₂₃.(x̂).*(Δx₃/2),
-                            f₃₃.(x̂).*(Δx₃/2),
-                           ))
+            ĥ = fieldarray(undef, SMatrix{3, 3, T, 9}, A, size(x̂))
+            ĥ₁₁, ĥ₂₁, ĥ₃₁, ĥ₁₂, ĥ₂₂, ĥ₃₂, ĥ₁₃, ĥ₂₃, ĥ₃₃ = components(ĥ)
+            ĥ₁₁ .= f₁₁.(x̂).*(Δx₁/2)
+            ĥ₂₁ .= f₂₁.(x̂).*(Δx₁/2)
+            ĥ₃₁ .= f₃₁.(x̂).*(Δx₁/2)
+            ĥ₁₂ .= f₁₂.(x̂).*(Δx₂/2)
+            ĥ₂₂ .= f₂₂.(x̂).*(Δx₂/2)
+            ĥ₃₂ .= f₃₂.(x̂).*(Δx₂/2)
+            ĥ₁₃ .= f₁₃.(x̂).*(Δx₃/2)
+            ĥ₂₃ .= f₂₃.(x̂).*(Δx₃/2)
+            ĥ₃₃ .= f₃₃.(x̂).*(Δx₃/2)
             Ĵ = adapt(Array, det.(ĥ))
             ĝ = adapt(Array, inv.(ĥ))
 

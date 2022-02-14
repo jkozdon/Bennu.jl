@@ -313,9 +313,9 @@ function materializemetrics(referencecell::LobattoQuad, points, unwarpedbrick)
     D₁, D₂ = derivatives(referencecell)
     x₁, x₂ = components(points)
 
+    h = fieldarray(undef, SMatrix{2, 2, T, 4}, A, (num_cellindices, num_cells))
+    h₁₁, h₂₁, h₁₂, h₂₂ = components(h)
     if unwarpedbrick
-        h = fieldarray(undef, SMatrix{2, 2, T, 4}, A, (num_cellindices, num_cells))
-        h₁₁, h₂₁, h₁₂, h₂₂ = components(h)
         x₁ = reshape(x₁, size(referencecell)..., num_cells)
         x₂ = reshape(x₂, size(referencecell)..., num_cells)
         @tullio avx=false h₁₁[i, e] = (x₁[end, 1, e] - x₁[1, 1, e]) / 2
@@ -323,7 +323,10 @@ function materializemetrics(referencecell::LobattoQuad, points, unwarpedbrick)
         h₁₂ .= 0
         @tullio avx=false h₂₂[i, e] = (x₂[1, end, e] - x₂[1, 1, e]) / 2
     else
-        h = fieldarray(SMatrix{2, 2, T, 4}, (D₁ * x₁, D₁ * x₂, D₂ * x₁, D₂ * x₂))
+        h₁₁ .= D₁ * x₁
+        h₂₁ .= D₁ * x₂
+        h₁₂ .= D₂ * x₁
+        h₂₂ .= D₂ * x₂
     end
 
     @. J = det(h)
@@ -422,9 +425,9 @@ function materializemetrics(referencecell::LobattoHex, points, unwarpedbrick)
     D₁, D₂, D₃ = derivatives(referencecell)
     x₁, x₂, x₃ = components(points)
 
+    h = fieldarray(undef, SMatrix{3, 3, T, 9}, A, (num_cellindices, num_cells))
+    h₁₁, h₂₁, h₃₁, h₁₂, h₂₂, h₃₂, h₁₃, h₂₃, h₃₃ = components(h)
     if unwarpedbrick
-        h = fieldarray(undef, SMatrix{3, 3, T, 9}, A, (num_cellindices, num_cells))
-        h₁₁, h₂₁, h₃₁, h₁₂, h₂₂, h₃₂, h₁₃, h₂₃, h₃₃ = components(h)
         x₁ = reshape(x₁, size(referencecell)..., num_cells)
         x₂ = reshape(x₂, size(referencecell)..., num_cells)
         x₃ = reshape(x₃, size(referencecell)..., num_cells)
@@ -441,9 +444,15 @@ function materializemetrics(referencecell::LobattoHex, points, unwarpedbrick)
         h₂₃ .= 0
         @tullio avx=false h₃₃[i, e] = (x₃[1, 1, end, e] - x₃[1, 1, 1, e]) / 2
     else
-        h = fieldarray(SMatrix{3, 3, T, 9}, (D₁ * x₁, D₁ * x₂, D₁ * x₃,
-                                             D₂ * x₁, D₂ * x₂, D₂ * x₃,
-                                             D₃ * x₁, D₃ * x₂, D₃ * x₃))
+        h₁₁ .= D₁ * x₁
+        h₂₁ .= D₁ * x₂
+        h₃₁ .= D₁ * x₃
+        h₁₂ .= D₂ * x₁
+        h₂₂ .= D₂ * x₂
+        h₃₂ .= D₂ * x₃
+        h₁₃ .= D₃ * x₁
+        h₂₃ .= D₃ * x₂
+        h₃₃ .= D₃ * x₃
     end
 
     @. J = det(h)
