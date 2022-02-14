@@ -442,20 +442,15 @@ function materializemetrics(referencecell::LobattoHex, points, unwarpedbrick)
         @tullio avx=false h₃₃[i, e] = (x₃[1, 1, end, e] - x₃[1, 1, 1, e]) / 2
     else
         h₁₁, h₂₁, h₃₁, h₁₂, h₂₂, h₃₂, h₁₃, h₂₃, h₃₃ = components(h)
-        @show typeof(h₁₁)
-        @show typeof(D₁)
-        @show typeof(x₁)
-        println("I'm Here!")
-        h₁₁ .= D₁ * x₁
-        h₁₂ .= D₁ * x₂
-        h₁₃ .= D₂ * x₃
-        h₂₁ .= D₂ * x₁
-        h₂₂ .= D₂ * x₂
-        h₂₃ .= D₁ * x₃
-        h₃₁ .= D₃ * x₁
-        h₃₂ .= D₃ * x₂
-        h₃₃ .= D₃ * x₃
-        println("Now I am here!")
+        @tullio h₁₁[i, e] = D₁[i, j] * x₁[j, e]
+        @tullio h₁₂[i, e] = D₁[i, j] * x₂[j, e]
+        @tullio h₁₃[i, e] = D₂[i, j] * x₃[j, e]
+        @tullio h₂₁[i, e] = D₂[i, j] * x₁[j, e]
+        @tullio h₂₂[i, e] = D₂[i, j] * x₂[j, e]
+        @tullio h₂₃[i, e] = D₁[i, j] * x₃[j, e]
+        @tullio h₃₁[i, e] = D₃[i, j] * x₁[j, e]
+        @tullio h₃₂[i, e] = D₃[i, j] * x₂[j, e]
+        @tullio h₃₃[i, e] = D₃[i, j] * x₃[j, e]
     end
 
     @. J = det(h)
