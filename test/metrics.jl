@@ -51,7 +51,7 @@
 
             unwarpedgrid = brickgrid(cell, (-1:Δx₁:1, -1:Δx₂:1))
             x̂ = points(unwarpedgrid)
-            ĥ = fieldarray(undef, SMatrix{2, 2, T, 4}, A, size(x̂))
+            ĥ = BennuArray(undef, SMatrix{2, 2, T, 4}, A, size(x̂))
             ĥ₁₁, ĥ₂₁, ĥ₁₂, ĥ₂₂ = components(ĥ)
             ĥ₁₁ .= f₁₁.(x̂).*(Δx₁/2)
             ĥ₂₁ .= f₂₁.(x̂).*(Δx₁/2)
@@ -132,7 +132,7 @@
 
             unwarpedgrid = brickgrid(cell, (-1:Δx₁:1, -1:Δx₂:1, -1:Δx₃:1))
             x̂ = points(unwarpedgrid)
-            ĥ = fieldarray(undef, SMatrix{3, 3, T, 9}, A, size(x̂))
+            ĥ = BennuArray(undef, SMatrix{3, 3, T, 9}, A, size(x̂))
             ĥ₁₁, ĥ₂₁, ĥ₃₁, ĥ₁₂, ĥ₂₂, ĥ₃₂, ĥ₁₃, ĥ₂₃, ĥ₃₃ = components(ĥ)
             ĥ₁₁ .= f₁₁.(x̂).*(Δx₁/2)
             ĥ₂₁ .= f₂₁.(x̂).*(Δx₁/2)

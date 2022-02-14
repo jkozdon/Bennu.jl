@@ -26,11 +26,11 @@ _fieldtype(::Type{S}) where {S} = eltype(S)
 _fieldtype(T::Tuple) = promote_type(map(_fieldtype, T)...)
 _fieldtype(N::NamedTuple) = promote_type(map(_fieldtype, N)...)
 
-function fieldarray(::UndefInitializer, S, ::Type{A}, dims::Dims) where {A}
+function BennuArray(::UndefInitializer, S, ::Type{A}, dims::Dims) where {A}
     N = _numfields(S)
     T = _fieldtype(S)
 
-    S isa Type && S <: Number && error("fieldarray requires `!(S <: Number)`")
+    S isa Type && S <: Number && error("BennuArray requires `!(S <: Number)`")
 
     if length(dims) == 0
         d = (N, )

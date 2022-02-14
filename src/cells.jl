@@ -204,7 +204,7 @@ function materializepoints(referencecell::LobattoLine, vertices, connectivity)
     T = floattype(referencecell)
     A = arraytype(referencecell)
     r = points_1d(referencecell)
-    p = fieldarray(undef, SVector{1, T}, A,
+    p = BennuArray(undef, SVector{1, T}, A,
                    (size(referencecell)..., length(connectivity)))
     connectivity = vec(connectivity)
     vertices = vec(vertices)
@@ -234,7 +234,7 @@ function materializemetrics(referencecell::LobattoLine, points, unwarpedbrick)
     faceconn = connectivity(referencecell)[2]
     num_facesindices = sum(length.(faceconn))
 
-    metrics = fieldarray(undef, (g=SMatrix{1, 1, T, 1}, J=T), A,
+    metrics = BennuArray(undef, (g=SMatrix{1, 1, T, 1}, J=T), A,
                          (num_cellindices, num_cells))
     g, J = components(metrics)
 
@@ -248,7 +248,7 @@ function materializemetrics(referencecell::LobattoLine, points, unwarpedbrick)
     end
     @. g = tuple(inv(J))
 
-    facemetrics = fieldarray(undef, (n=SVector{1, T}, J=T), A,
+    facemetrics = BennuArray(undef, (n=SVector{1, T}, J=T), A,
                              (num_facesindices, num_cells))
     n, fJ = components(facemetrics)
 
@@ -267,7 +267,7 @@ function materializepoints(referencecell::LobattoQuad,
     A = arraytype(referencecell)
     r = vec.(points_1d(referencecell))
 
-    p = fieldarray(undef, SVector{PDIM, T}, A,
+    p = BennuArray(undef, SVector{PDIM, T}, A,
                    (size(referencecell)..., length(connectivity)))
 
     connectivity = vec(connectivity)
@@ -306,14 +306,14 @@ function materializemetrics(referencecell::LobattoQuad, points, unwarpedbrick)
     faceconn = connectivity(referencecell)[2]
     num_facesindices = sum(length.(faceconn))
 
-    metrics = fieldarray(undef, (g=SMatrix{2, 2, T, 4}, J=T), A,
+    metrics = BennuArray(undef, (g=SMatrix{2, 2, T, 4}, J=T), A,
                          (num_cellindices, num_cells))
     g, J = components(metrics)
 
     D₁, D₂ = derivatives(referencecell)
     x₁, x₂ = components(points)
 
-    h = fieldarray(undef, SMatrix{2, 2, T, 4}, A, (num_cellindices, num_cells))
+    h = BennuArray(undef, SMatrix{2, 2, T, 4}, A, (num_cellindices, num_cells))
     h₁₁, h₂₁, h₁₂, h₂₂ = components(h)
     if unwarpedbrick
         x₁ = reshape(x₁, size(referencecell)..., num_cells)
@@ -332,7 +332,7 @@ function materializemetrics(referencecell::LobattoQuad, points, unwarpedbrick)
     @. J = det(h)
     @. g = inv(h)
 
-    facemetrics = fieldarray(undef, (n=SVector{2, T}, J=T), A,
+    facemetrics = BennuArray(undef, (n=SVector{2, T}, J=T), A,
                              (num_facesindices, num_cells))
     n, fJ = components(facemetrics)
 
@@ -367,7 +367,7 @@ function materializepoints(referencecell::LobattoHex, vertices, connectivity)
     T = floattype(referencecell)
     A = arraytype(referencecell)
     r = vec.(points_1d(referencecell))
-    p = fieldarray(undef, SVector{3, T}, A,
+    p = BennuArray(undef, SVector{3, T}, A,
                    (size(referencecell)..., length(connectivity)))
 
     connectivity = vec(connectivity)
@@ -418,14 +418,14 @@ function materializemetrics(referencecell::LobattoHex, points, unwarpedbrick)
     faceconn = connectivity(referencecell)[2]
     num_facesindices = sum(length.(faceconn))
 
-    metrics = fieldarray(undef, (g=SMatrix{3, 3, T, 9}, J=T), A,
+    metrics = BennuArray(undef, (g=SMatrix{3, 3, T, 9}, J=T), A,
                          (num_cellindices, num_cells))
     g, J = components(metrics)
 
     D₁, D₂, D₃ = derivatives(referencecell)
     x₁, x₂, x₃ = components(points)
 
-    h = fieldarray(undef, SMatrix{3, 3, T, 9}, A, (num_cellindices, num_cells))
+    h = BennuArray(undef, SMatrix{3, 3, T, 9}, A, (num_cellindices, num_cells))
     h₁₁, h₂₁, h₃₁, h₁₂, h₂₂, h₃₂, h₁₃, h₂₃, h₃₃ = components(h)
     if unwarpedbrick
         x₁ = reshape(x₁, size(referencecell)..., num_cells)
@@ -496,7 +496,7 @@ function materializemetrics(referencecell::LobattoHex, points, unwarpedbrick)
         g₃₃ .= (D₁ * xh₃₂ .- D₂ * xh₃₁) ./ (2 .* J)
     end
 
-    facemetrics = fieldarray(undef, (n=SVector{3, T}, J=T), A,
+    facemetrics = BennuArray(undef, (n=SVector{3, T}, J=T), A,
                              (num_facesindices, num_cells))
     n, fJ = components(facemetrics)
 
